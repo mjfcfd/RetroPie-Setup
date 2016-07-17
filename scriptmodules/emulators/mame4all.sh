@@ -60,7 +60,7 @@ function configure_mame4all() {
     moveConfigFile "mame.cfg" "$md_conf_root/$system/mame.cfg"
 
     local config="$(mktemp)"
-    copy "mame.cfg.template" "$config"
+    copy "mame.cfg.template" "$config" # should this be 'cp'? 
 
     iniConfig "=" "" "$config"
     iniSet "cfg" "$md_conf_root/$system/cfg"

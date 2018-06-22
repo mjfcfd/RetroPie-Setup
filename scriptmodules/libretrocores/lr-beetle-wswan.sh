@@ -1,25 +1,23 @@
 #!/usr/bin/env bash
 
 # This file is part of The RetroPie Project
-# 
+#
 # The RetroPie Project is the legal property of its developers, whose names are
 # too numerous to list here. Please refer to the COPYRIGHT.md file distributed with this source.
-# 
-# See the LICENSE.md file at the top-level directory of this distribution and 
+#
+# See the LICENSE.md file at the top-level directory of this distribution and
 # at https://raw.githubusercontent.com/RetroPie/RetroPie-Setup/master/LICENSE.md
 #
 
 rp_module_id="lr-beetle-wswan"
 rp_module_desc="Wonderswan emu - Mednafen WonderSwan core port for libretro"
 rp_module_help="ROM Extensions: .ws .wsc .zip\n\nCopy your Wonderswan roms to $romdir/wonderswan\n\nCopy your Wonderswan Color roms to $romdir/wonderswancolor"
+rp_module_licence="GPL2 https://raw.githubusercontent.com/libretro/beetle-wswan-libretro/master/COPYING"
 rp_module_section="opt"
 
 function _update_hook_lr-beetle-wswan() {
     # move from old location and update emulators.cfg
-    if [[ -d "$rootdir/$md_type/lr-mednafen-wswan" ]]; then
-        mv "$rootdir/$md_type/lr-mednafen-wswan" "$md_inst"
-        sed -i "s/lr-mednafen-wswan/lr-beetle-wswan/g" "$configdir"/*/emulators.cfg
-    fi
+    renameModule "lr-mednafen-wswan" "lr-beetle-wswan"
 }
 
 function sources_lr-beetle-wswan() {
@@ -44,6 +42,8 @@ function configure_lr-beetle-wswan() {
     ensureSystemretroconfig "wonderswan"
     ensureSystemretroconfig "wonderswancolor"
 
-    addSystem 1 "$md_id" "wonderswan" "$md_inst/mednafen_wswan_libretro.so"
-    addSystem 1 "$md_id" "wonderswancolor" "$md_inst/mednafen_wswan_libretro.so"
+    addEmulator 1 "$md_id" "wonderswan" "$md_inst/mednafen_wswan_libretro.so"
+    addEmulator 1 "$md_id" "wonderswancolor" "$md_inst/mednafen_wswan_libretro.so"
+    addSystem "wonderswan"
+    addSystem "wonderswancolor"
 }

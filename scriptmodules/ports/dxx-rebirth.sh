@@ -1,18 +1,19 @@
 #!/usr/bin/env bash
 
 # This file is part of The RetroPie Project
-# 
+#
 # The RetroPie Project is the legal property of its developers, whose names are
 # too numerous to list here. Please refer to the COPYRIGHT.md file distributed with this source.
-# 
-# See the LICENSE.md file at the top-level directory of this distribution and 
+#
+# See the LICENSE.md file at the top-level directory of this distribution and
 # at https://raw.githubusercontent.com/RetroPie/RetroPie-Setup/master/LICENSE.md
 #
 
 rp_module_id="dxx-rebirth"
 rp_module_desc="DXX-Rebirth (Descent & Descent 2) build from source"
+rp_module_licence="NONCOM https://raw.githubusercontent.com/dxx-rebirth/dxx-rebirth/master/COPYING.txt"
 rp_module_section="opt"
-rp_module_flags="!mali"
+rp_module_flags="!mali !kms"
 
 function depends_dxx-rebirth() {
     local depends=(libphysfs1 libphysfs-dev libsdl1.2-dev libsdl-mixer1.2-dev scons)
@@ -21,7 +22,7 @@ function depends_dxx-rebirth() {
 }
 
 function sources_dxx-rebirth() {
-    gitPullOrClone "$md_build" https://github.com/dxx-rebirth/dxx-rebirth "unification/master"
+    gitPullOrClone "$md_build" https://github.com/dxx-rebirth/dxx-rebirth "master"
 }
 
 function build_dxx-rebirth() {
@@ -72,9 +73,7 @@ function game_data_dxx-rebirth() {
 
     # Download / unpack / install Descent shareware files
     if [[ ! -f "$romdir/ports/descent1/descent.hog" ]]; then
-        wget -nv -O descent-pc-shareware.zip "$D1X_SHARE_URL"
-        unzip -o descent-pc-shareware.zip -d "$romdir/ports/descent1"
-        rm descent-pc-shareware.zip
+        downloadAndExtract "$D1X_SHARE_URL" "$romdir/ports/descent1"
     fi
 
     # High Res Texture Pack
@@ -86,12 +85,10 @@ function game_data_dxx-rebirth() {
     if [[ ! -f "$romdir/ports/descent1/d1xr-sc55-music.dxa" ]]; then
         wget -nv -P "$romdir/ports/descent1" "$D1X_OGG_URL"
     fi
-    
+
     # Download / unpack / install Descent 2 shareware files
     if [[ ! -f "$romdir/ports/descent2/D2DEMO.HOG" ]]; then
-        wget -nv "$D2X_SHARE_URL"
-        unzip -o descent2-pc-demo.zip -d "$romdir/ports/descent2"
-        rm descent2-pc-demo.zip
+        downloadAndExtract "$D2X_SHARE_URL" "$romdir/ports/descent2"
     fi
 
     # Ogg Sound Replacement (Roland Sound Canvas SC-55 MIDI)
@@ -104,9 +101,11 @@ function game_data_dxx-rebirth() {
 
 function configure_dxx-rebirth() {
     local ver
+    local name="Descent Rebirth"
     for ver in 1 2; do
         mkRomDir "ports/descent${ver}"
-        addPort "$md_id" "descent${ver}" "Descent Rebirth" "$md_inst/d${ver}x-rebirth -hogdir $romdir/ports/descent${ver}"
+        [[ "$ver" -eq 2 ]] && name="Descent 2 Rebirth"
+        addPort "$md_id" "descent${ver}" "$name" "$md_inst/d${ver}x-rebirth -hogdir $romdir/ports/descent${ver}"
 
         # copy any existing configs from ~/.d1x-rebirth and symlink the config folder to $md_conf_root/descent1/
         moveConfigDir "$home/.d${ver}x-rebirth" "$md_conf_root/descent${ver}/"

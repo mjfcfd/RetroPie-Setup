@@ -1,25 +1,23 @@
 #!/usr/bin/env bash
 
 # This file is part of The RetroPie Project
-# 
+#
 # The RetroPie Project is the legal property of its developers, whose names are
 # too numerous to list here. Please refer to the COPYRIGHT.md file distributed with this source.
-# 
-# See the LICENSE.md file at the top-level directory of this distribution and 
+#
+# See the LICENSE.md file at the top-level directory of this distribution and
 # at https://raw.githubusercontent.com/RetroPie/RetroPie-Setup/master/LICENSE.md
 #
 
 rp_module_id="lr-beetle-ngp"
 rp_module_desc="Neo Geo Pocket(Color)emu - Mednafen Neo Geo Pocket core port for libretro"
 rp_module_help="ROM Extensions: .ngc .ngp .zip\n\nCopy your Neo Geo Pocket roms to $romdir/ngp\n\nCopy your Neo Geo Pocket Color roms to $romdir/ngpc"
+rp_module_licence="GPL2 https://raw.githubusercontent.com/libretro/beetle-ngp-libretro/master/COPYING"
 rp_module_section="main"
 
 function _update_hook_lr-beetle-ngp() {
     # move from old location and update emulators.cfg
-    if [[ -d "$rootdir/$md_type/lr-mednafen-ngp" ]]; then
-        mv "$rootdir/$md_type/lr-mednafen-ngp" "$md_inst"
-        sed -i "s/lr-mednafen-ngp/lr-beetle-ngp/g" "$configdir"/*/emulators.cfg
-    fi
+    renameModule "lr-mednafen-ngp" "lr-beetle-ngp"
 }
 
 function sources_lr-beetle-ngp() {
@@ -39,11 +37,12 @@ function install_lr-beetle-ngp() {
 }
 
 function configure_lr-beetle-ngp() {
-    mkRomDir "ngp"
-    mkRomDir "ngpc"
-    ensureSystemretroconfig "ngp"
-    ensureSystemretroconfig "ngpc"
+    local system
+    for system in ngp ngpc; do
+        mkRomDir "$system"
+        ensureSystemretroconfig "$system"
+        addEmulator 1 "$md_id" "$system" "$md_inst/mednafen_ngp_libretro.so"
+        addSystem "$system"
+    done
 
-    addSystem 1 "$md_id" "ngp" "$md_inst/mednafen_ngp_libretro.so"
-    addSystem 1 "$md_id" "ngpc" "$md_inst/mednafen_ngp_libretro.so"
 }

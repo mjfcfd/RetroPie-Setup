@@ -1,19 +1,20 @@
 #!/usr/bin/env bash
 
 # This file is part of The RetroPie Project
-# 
+#
 # The RetroPie Project is the legal property of its developers, whose names are
 # too numerous to list here. Please refer to the COPYRIGHT.md file distributed with this source.
-# 
-# See the LICENSE.md file at the top-level directory of this distribution and 
+#
+# See the LICENSE.md file at the top-level directory of this distribution and
 # at https://raw.githubusercontent.com/petrockblog/RetroPie-Setup/master/LICENSE.md.
 #
 
 rp_module_id="zesarux"
 rp_module_desc="ZX Spectrum emulator ZEsarUX"
-rp_module_help="ROM Extensions: .sna .szx .z80 .tap .tzx .gz .udi .mgt .img .trd .scl .dsk .zip\n\nCopy your ZX Spectrum roms to $romdir/zxspectrum"
+rp_module_help="ROM Extensions: .sna .szx .z80 .tap .tzx .gz .udi .mgt .img .trd .scl .dsk .zip\n\nCopy your ZX Spectrum games to $romdir/zxspectrum"
+rp_module_licence="GPL3 https://sourceforge.net/p/zesarux/code/ci/master/tree/LICENSE"
 rp_module_section="opt"
-rp_module_flags="dispmanx !mali"
+rp_module_flags="dispmanx !mali !kms"
 
 function depends_zesarux() {
     local depends=(libssl-dev libpthread-stubs0-dev libsdl1.2-dev libasound2-dev)
@@ -22,7 +23,7 @@ function depends_zesarux() {
 }
 
 function sources_zesarux() {
-    wget -O- -q "$__archive_url/ZEsarUX_src-3.0.tar.gz" | tar -xvz --strip-components=1
+    downloadAndExtract "$__archive_url/ZEsarUX_src-5.0.tar.gz" "$md_build" 1
 }
 
 function build_zesarux() {
@@ -41,6 +42,8 @@ function install_zesarux() {
 
 function configure_zesarux() {
     mkRomDir "zxspectrum"
+    mkRomDir "amstradcpc"
+    mkRomDir "samcoupe"
 
     mkUserDir "$md_conf_root/zxspectrum"
 
@@ -53,10 +56,10 @@ _EOF_
 
     moveConfigFile "$home/.zesaruxrc" "$md_conf_root/zxspectrum/.zesaruxrc"
 
-    local ao="alsa"
+    local ao="sdl"
     isPlatform "x11" && ao="pulse"
     local config="$(mktemp)"
-    
+
     cat > "$config" << _EOF_
 ;ZEsarUX sample configuration file
 ;
@@ -76,14 +79,19 @@ _EOF_
 
 ;Remap Fire Event. Uncomment and amend if you wish to change the default button 3.
 ;--joystickevent 3 Fire
+;Remap On-screen keyboard. Uncomment and amend if you wish to change the default button 5.
+;--joystickevent 5 Osdkeyboard
 _EOF_
 
     copyDefaultConfig "$config" "$md_conf_root/zxspectrum/.zesaruxrc"
     rm "$config"
 
-    if isPlatform "rpi"; then
-        setDispmanx "$md_id" 1
-    fi
+    setDispmanx "$md_id" 1
 
-    addSystem 1 "$md_id" "zxspectrum" "$romdir/zxspectrum/+Start\ ZEsarUX.sh %ROM%" "" ".sh"
+    addEmulator 1 "$md_id" "zxspectrum" "bash $romdir/zxspectrum/+Start\ ZEsarUX.sh %ROM%"
+    addEmulator 1 "$md_id" "samcoupe" "bash $romdir/zxspectrum/+Start\ ZEsarUX.sh --machine sam %ROM%"
+    addEmulator 1 "$md_id" "amstradcpc" "bash $romdir/zxspectrum/+Start\ ZEsarUX.sh --machine CPC464 %ROM%"
+    addSystem "zxspectrum"
+    addSystem "samcoupe"
+    addSystem "amstradcpc"
 }

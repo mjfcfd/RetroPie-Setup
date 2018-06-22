@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
 
 # This file is part of The RetroPie Project
-# 
+#
 # The RetroPie Project is the legal property of its developers, whose names are
 # too numerous to list here. Please refer to the COPYRIGHT.md file distributed with this source.
-# 
-# See the LICENSE.md file at the top-level directory of this distribution and 
+#
+# See the LICENSE.md file at the top-level directory of this distribution and
 # at https://raw.githubusercontent.com/RetroPie/RetroPie-Setup/master/LICENSE.md
 #
 
 rp_module_id="lr-gw"
 rp_module_desc="Game and Watch simulator"
-rp_module_help="ROM Extension: .mgw\n\nCopy your Game and Watch roms to $romdir/gameandwatch"
+rp_module_help="ROM Extension: .mgw\n\nCopy your Game and Watch games to $romdir/gameandwatch"
+rp_module_licence="ZLIB https://raw.githubusercontent.com/libretro/gw-libretro/master/LICENSE"
 rp_module_section="opt"
 
 function sources_lr-gw() {
@@ -36,5 +37,6 @@ function configure_lr-gw() {
     mkRomDir "gameandwatch"
     ensureSystemretroconfig "gameandwatch"
 
-    addSystem 1 "$md_id" "gameandwatch" "$md_inst/gw_libretro.so" "Game and Watch" ".mgw"
+    addEmulator 1 "$md_id" "gameandwatch" "$md_inst/gw_libretro.so"
+    addSystem "gameandwatch"
 }
